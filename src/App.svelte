@@ -1,11 +1,20 @@
 <script>
-	export let name;
+  import ImageConstructor from './components/image-constructor/ImageConstructor.svelte';
 </script>
 
 <style>
-	h1 {
-		color: purple;
-	}
+	:global(body) {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    --white-color: white;
+    --black-color: black;
+    --main-grey-color: #ccc;
+
+    --main-borders-color: blanchedalmond;
+    --main-no-image-bg-color: aliceblue;
+  }
 </style>
 
-<h1>Four Photo One Word helper!</h1>
+<ImageConstructor />

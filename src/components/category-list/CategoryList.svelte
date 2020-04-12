@@ -1,5 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { slide } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 
   import { categoriesStore } from './store.js';
 
@@ -18,8 +20,7 @@
 		justify-content: center;
 		width: 100%;
 		height: 100%;
-    background-color: var(--white-color);
-    border: 2px solid var(--main-grey-color);
+    background-color: var(--main-bg-color);
     position: fixed;
     top: 0;
     left: 0;
@@ -39,10 +40,16 @@
   .category-confirm {
     width: 50%;
     margin-top: 10%;
+    background-color: var(--main-button-bg-color);
+    border-radius: 10px;
   }
 </style>
 
-<div class="container">
+<div
+  class="container"
+  transition:slide="{{delay: 50, duration: 500, easing: quintOut }}"
+>
+  <h2>Выберите категорию</h2>
   {#each $categoriesStore.categoryList as category, index}
     <button
       type="button"

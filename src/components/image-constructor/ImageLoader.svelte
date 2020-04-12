@@ -1,8 +1,14 @@
 <script>
   import { onMount } from 'svelte';
+  import { crossfade, scale } from 'svelte/transition';
 
   import TabLoader from './TabLoader.svelte';
   import { imagesStore } from './store.js';
+
+  const [send, receive] = crossfade({
+		duration: 200,
+		fallback: scale
+  });
 
   let url = '';
   export let selected;
@@ -32,7 +38,7 @@
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
-    background-color: var(--white-color);
+    background-color: var(--main-bg-color);
     border: 2px solid var(--main-grey-color);
   }
 
@@ -63,6 +69,8 @@
   .close-button {
     position: absolute;
     right: 0px;
+    background-color: var(--main-button-bg-color);
+    border-radius: 3px;
   }
 
   @media screen and (max-width: 500px) {
@@ -83,7 +91,11 @@
   }
 </style>
 
-<div class="container">
+<div
+  class="container"
+  in:receive={{key:selected}}
+	out:send={{key:selected}}
+>
   <div>
     <h2>Загрузка изображения</h2>
     <button class="close-button" on:click>x</button>

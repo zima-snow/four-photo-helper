@@ -70,7 +70,31 @@
       social,
     };
 
+    console.log(request);
+
     // TODO: Request to server
+
+    // const formData = new FormData();
+
+    // formData.append('imageData', fileData);
+    
+    // $.ajax({
+		//   type: 'POST',
+		//   url: '/your/upload/url',
+		//   data: formData,
+		//   contentType: false,
+		//   processData: false,
+		//   success: function (data) {
+		//   	if (data.success) {
+		//   		alert('Your file was successfully uploaded!');
+		//   	} else {
+		//   		alert('There was an error uploading your file!');
+		//   	}
+		//   },
+		//   error: function (data) {
+		//   	alert('There was an error uploading your file!');
+		//   }
+	  // });
   };
 
   const handleCategoryListOpen = () => {
@@ -89,6 +113,7 @@
 		justify-content: center;
 		width: 100%;
 		height: 100%;
+    background-color: var(--main-bg-color);
 	}
 
 	.phone {
@@ -108,7 +133,9 @@
   }
 
   .humburger {
-     display: none;
+    display: none;
+    background-color: var(--main-button-bg-color);
+    border-radius: 10px;
   }
 
 	.grid-img {
@@ -153,6 +180,11 @@
 
   .grid-item-social {
     grid-column: 1 / -1;
+  }
+
+  .upload-button {
+    background-color: var(--main-button-bg-color);
+    border-radius: 10px;
   }
 
   @media screen and (max-width: 500px) {
@@ -217,6 +249,8 @@
                 src={image.dataUrl || image.url}
                 alt={image.id}
                 on:click="{() => handleSelectImage(image.id)}"
+                in:receive={{key:image.id}}
+							  out:send={{key:image.id}}
               />
             {/if}
 					{/if}
@@ -226,7 +260,7 @@
 
     <div class="grid-info">
       <div class="grid-item-word">
-        <label for="word">Слово (от 3 до 12 букв)</label>
+        <label for="word">Слово (3 - 12 букв)</label>
         <input
           id="word"
           type="text"
@@ -256,10 +290,11 @@
 
     <button
       type="button"
+      class="upload-button"
       disabled={isLoadDisabled}
       on:click={handleLoadClick}
     >
-      Загрузить
+      Загрузить задание
     </button>
 
     {#if selected}

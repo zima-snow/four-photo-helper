@@ -52,6 +52,7 @@
   .tab-container {
     width: 100%;
     margin-top: 20px;
+    background-color: var(--main-bg-color);
   }
 
   .tab-buttons-container {
@@ -61,7 +62,6 @@
   .tab-button {
     border: none;
     flex: 1;
-    border-right: 2px solid var(--main-borders-color);
   }
 
   .tab-button.active {
@@ -87,6 +87,8 @@
   .tab-content > button {
     margin-top: 2%;
     width: 50%;
+    background-color: var(--main-button-bg-color);
+    border-radius: 10px;
   }
 </style>
 

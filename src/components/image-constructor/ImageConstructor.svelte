@@ -1,5 +1,6 @@
 <script>
   import { crossfade, scale } from 'svelte/transition';
+  import wretch from 'wretch';
 
   import CategoryList from '../category-list/CategoryList.svelte';
   import ImageLoader from './ImageLoader.svelte';
@@ -35,6 +36,7 @@
         return {
           ...image,
           url: detail,
+          extension : detail.substring(detail.lastIndexOf('.') + 1),
         };
       }
       return image;
@@ -51,6 +53,7 @@
           return {
             ...image,
             dataUrl: newDataUrl,
+            extension: fileType,
           };
         }
         return image;
@@ -61,16 +64,26 @@
     });
   }
 
-  const handleLoadClick = () => {
-    const request = {
-      currentCategory: $categoriesStore.categoryList[$categoriesStore.currentCategoryIndex],
-      images: $imagesStore,
-      word,
-      nickname,
-      social,
-    };
+  const handleLoadClick = async () => {
+    try {
+      const request = {
+        category: $categoriesStore.categoryList[$categoriesStore.currentCategoryIndex],
+        images: $imagesStore,
+        word,
+        nickname,
+        social,
+      };
+      // TODO: Create constant for API address
+      const response = await wretch().url('http://127.0.0.1:5000/api/candidates')
+        .post(request)
+        .json();
 
-    // TODO: Request to server
+      // TODO: Create notification
+      console.log(response);
+    } catch (e) {
+      // TODO: Create notification
+      console.error(e);
+    }
   };
 
   const handleCategoryListOpen = () => {
@@ -89,6 +102,7 @@
 		justify-content: center;
 		width: 100%;
 		height: 100%;
+    background-color: var(--main-bg-color);
 	}
 
 	.phone {
@@ -108,7 +122,9 @@
   }
 
   .humburger {
-     display: none;
+    display: none;
+    background-color: var(--main-button-bg-color);
+    border-radius: 10px;
   }
 
 	.grid-img {
@@ -153,6 +169,11 @@
 
   .grid-item-social {
     grid-column: 1 / -1;
+  }
+
+  .upload-button {
+    background-color: var(--main-button-bg-color);
+    border-radius: 10px;
   }
 
   @media screen and (max-width: 500px) {
@@ -217,6 +238,8 @@
                 src={image.dataUrl || image.url}
                 alt={image.id}
                 on:click="{() => handleSelectImage(image.id)}"
+                in:receive={{key:image.id}}
+							  out:send={{key:image.id}}
               />
             {/if}
 					{/if}
@@ -226,7 +249,7 @@
 
     <div class="grid-info">
       <div class="grid-item-word">
-        <label for="word">Слово (от 3 до 12 букв)</label>
+        <label for="word">Слово (3 - 12 букв)</label>
         <input
           id="word"
           type="text"
@@ -256,10 +279,11 @@
 
     <button
       type="button"
+      class="upload-button"
       disabled={isLoadDisabled}
       on:click={handleLoadClick}
     >
-      Загрузить
+      Загрузить задание
     </button>
 
     {#if selected}

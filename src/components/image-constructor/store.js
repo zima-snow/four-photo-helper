@@ -7,6 +7,7 @@ export const imagesStore = writable([
     url: '',
     dataUrl: '',
     order: 1,
+    extension: '',
   },
   {
     id: '2',
@@ -14,6 +15,7 @@ export const imagesStore = writable([
     url: '',
     dataUrl: '',
     order: 2,
+    extension: '',
   },
   {
     id: '3',
@@ -21,6 +23,7 @@ export const imagesStore = writable([
     url: '',
     dataUrl: '',
     order: 3,
+    extension: '',
   },
   {
     id: '4',
@@ -28,6 +31,7 @@ export const imagesStore = writable([
     url: '',
     dataUrl: '',
     order: 4,
+    extension: '',
   },
 ]);
 

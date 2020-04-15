@@ -1,11 +1,20 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
+  import { quintOut } from 'svelte/easing';
+  import wretch from 'wretch';
 
   import { categoriesStore } from './store.js';
 
   const dispatch = createEventDispatcher();
+
+  onMount(async () => {
+    const categoryList = await wretch().url('http://127.0.0.1:5000/api/categories')
+      .get()
+      .json();
+
+    categoriesStore.update(prev => ({ ...prev, categoryList }));
+  });
 
   const handleCategoryChange = (currentCategoryIndex) => {
     categoriesStore.update(prev => ({ ...prev, currentCategoryIndex }));

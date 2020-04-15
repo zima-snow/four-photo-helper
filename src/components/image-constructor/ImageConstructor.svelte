@@ -1,5 +1,6 @@
 <script>
   import { crossfade, scale } from 'svelte/transition';
+  import wretch from 'wretch';
 
   import CategoryList from '../category-list/CategoryList.svelte';
   import ImageLoader from './ImageLoader.svelte';
@@ -35,6 +36,7 @@
         return {
           ...image,
           url: detail,
+          extension : detail.substring(detail.lastIndexOf('.') + 1),
         };
       }
       return image;
@@ -51,6 +53,7 @@
           return {
             ...image,
             dataUrl: newDataUrl,
+            extension: fileType,
           };
         }
         return image;
@@ -61,40 +64,26 @@
     });
   }
 
-  const handleLoadClick = () => {
-    const request = {
-      currentCategory: $categoriesStore.categoryList[$categoriesStore.currentCategoryIndex],
-      images: $imagesStore,
-      word,
-      nickname,
-      social,
-    };
+  const handleLoadClick = async () => {
+    try {
+      const request = {
+        category: $categoriesStore.categoryList[$categoriesStore.currentCategoryIndex],
+        images: $imagesStore,
+        word,
+        nickname,
+        social,
+      };
+      // TODO: Create constant for API address
+      const response = await wretch().url('http://127.0.0.1:5000/api/candidates')
+        .post(request)
+        .json();
 
-    console.log(request);
-
-    // TODO: Request to server
-
-    // const formData = new FormData();
-
-    // formData.append('imageData', fileData);
-    
-    // $.ajax({
-		//   type: 'POST',
-		//   url: '/your/upload/url',
-		//   data: formData,
-		//   contentType: false,
-		//   processData: false,
-		//   success: function (data) {
-		//   	if (data.success) {
-		//   		alert('Your file was successfully uploaded!');
-		//   	} else {
-		//   		alert('There was an error uploading your file!');
-		//   	}
-		//   },
-		//   error: function (data) {
-		//   	alert('There was an error uploading your file!');
-		//   }
-	  // });
+      // TODO: Create notification
+      console.log(response);
+    } catch (e) {
+      // TODO: Create notification
+      console.error(e);
+    }
   };
 
   const handleCategoryListOpen = () => {

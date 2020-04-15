@@ -29,7 +29,7 @@
         fileType = files[0].type;
 
         fr.onload = () => {
-          dataUrl = fr.result
+          dataUrl = fr.result;
           dispatch('previewImageEvent', dataUrl);
         };
 

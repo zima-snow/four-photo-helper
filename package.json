@@ -4,6 +4,7 @@
   "devDependencies": {
     "cross-env": "^5.2.0",
     "css-loader": "^2.1.1",
+    "html-webpack-plugin": "^4.2.0",
     "mini-css-extract-plugin": "^0.6.0",
     "serve": "^11.0.0",
     "style-loader": "^0.23.1",
@@ -14,8 +15,14 @@
     "webpack-dev-server": "^3.3.1"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack",
-    "dev": "webpack-dev-server --content-base public"
+    "build:old": "cross-env NODE_ENV=production webpack",
+    "dev:old": "webpack-dev-server --content-base public",
+    "start": "yarn run dev",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --config webpack.develop.config.js --progress --colors --content-base public",
+    "prebuild": "rm -rf ./dist",
+    "build": "cross-env NODE_ENV=production webpack --config webpack.production.config.js --progress --node-flags --max-old-space-size=4096 --source-maps",
+    "postbuild": "cp ./public/* ./dist",
+    "publish": "scp -r ./dist/* lex@165.22.192.60:/var/www/for-alexander.tk/html"
   },
   "dependencies": {
     "wretch": "^1.7.2"

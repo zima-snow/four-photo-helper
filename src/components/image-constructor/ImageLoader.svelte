@@ -38,27 +38,42 @@
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
-    background-color: var(--main-bg-color);
     border: 2px solid var(--main-grey-color);
+    background: var(--main-bg-color); /* Old browsers */
+    background: -moz-linear-gradient(45deg, #4c4c4c 0%, #595959 12%, #666666 25%, #474747 39%, #2c2c2c 50%, #000000 51%, #111111 60%, #2b2b2b 76%, #1c1c1c 91%, #131313 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   }
 
   .no-image {
     background-color: var(--main-no-image-bg-color);
     border: 1px solid var(--main-borders-color);
     border-radius: 10px;
-    width: 50%;
-    height: 65%;
+    width: 70%;
+    height: 60%;
     margin-top: 3vmin;
     display: flex;
-    align-items: center;
+    flex-flow: column wrap;
+    justify-content: space-evenly;
     text-align: center;
+    padding: 5px;
+    font-size: 1.1em;
+  }
+
+  .no-image a {
+    color: var(--light-yellow);
+    text-decoration: underline;
+  }
+
+  .example {
+    word-break: break-word;
   }
 
   img {
     border: 1px solid var(--main-borders-color);
     border-radius: 10px;
-    width: 50%;
-    height: 65%;
+    width: 70%;
+    height: 60%;
     margin-top: 3vmin;
   }
 
@@ -71,6 +86,16 @@
     right: 0px;
     background-color: var(--main-button-bg-color);
     border-radius: 3px;
+  }
+
+  .notice-text {
+    color: var(--light-yellow);
+  }
+
+  @media screen and (max-width: 1024px) {
+    .container {
+      height: 99%;
+    }
   }
 
   @media screen and (max-width: 500px) {
@@ -101,7 +126,22 @@
     <button class="close-button" on:click>x</button>
   </div>
   {#if url === ''}
-    <div class="no-image">Нет картинки. Выберите один из вариантов добавления ниже и загрузите картинку</div>
+    <div class="no-image">
+      Нет картинки. Выберите один из вариантов добавления ниже и загрузите картинку.
+      
+      <div class="example">
+        При добавлении URL картинки, адрес должен заканчиваться на
+        <span class="notice-text">".jpg", ".jpeg", ".png" или ".gif"</span>.
+        Например: <span class="notice-text">https://ercourse.com/images/channel_image.png</span>
+      </div>
+
+      <div>
+        Картинки можно найти
+        <a href="https://www.google.ru/imghp?hl=ru" target="_blank">в Google Картинках</a>
+        или
+        <a href="https://yandex.ru/images/" target="_blank">в Яндекс Картинках</a>
+      </div>
+    </div>
   {:else}
     <img src={url} alt="Произошла ошибка при загрузке картинки" />
   {/if}

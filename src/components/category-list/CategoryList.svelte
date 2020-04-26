@@ -4,16 +4,30 @@
   import { quintOut } from 'svelte/easing';
   import wretch from 'wretch';
 
+  import Loader from '../loader/Loader.svelte';
   import { categoriesStore } from './store.js';
+  import { notificationStore } from '../notification/store.js';
+  import { API_URL } from '../../consts/common.js';
 
   const dispatch = createEventDispatcher();
 
-  onMount(async () => {
-    const categoryList = await wretch().url('http://127.0.0.1:5000/api/categories')
-      .get()
-      .json();
+  let isLoading = false;
 
-    categoriesStore.update(prev => ({ ...prev, categoryList }));
+  onMount(async () => {
+    try { 
+      if ($categoriesStore.categoryList.length === 0) {
+        isLoading = true;
+        const categoryList = await wretch().url(`${API_URL}/categories`)
+        .get()
+        .json();
+
+        categoriesStore.update(prev => ({ ...prev, categoryList }));
+        isLoading = false;
+      }
+    } catch (e) {
+      const error = JSON.parse(e.message);
+      notificationStore.set({ message: error.message, type: 'error' });
+    }
   });
 
   const handleCategoryChange = (currentCategoryIndex) => {
@@ -27,12 +41,15 @@
     flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		width: 100%;
+		width: 50%;
 		height: 100%;
-    background-color: var(--main-bg-color);
+    background: var(--main-bg-color); /* Old browsers */
+    background: -moz-linear-gradient(-45deg,  #4c4c4c 0%, #595959 12%, #666666 25%, #474747 39%, #2c2c2c 50%, #000000 51%, #111111 60%, #2b2b2b 76%, #1c1c1c 91%, #131313 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(-45deg,  #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(135deg,  #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     position: fixed;
     top: 0;
-    left: 0;
+    left: 25%;
     z-index: 1;
 	}
 
@@ -51,6 +68,20 @@
     margin-top: 10%;
     background-color: var(--main-button-bg-color);
     border-radius: 10px;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .container {
+      width: 70%;
+      left: 15%;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .container {
+      width: 100%;
+      left: 0;
+    }
   }
 </style>
 
@@ -73,7 +104,11 @@
     type="button"
     class="category-confirm"
     on:click={() => dispatch('categoryChosenEvent')}
+    disabled={$categoriesStore.categoryList.length === 0}
   >
     OK
   </button>
+  {#if isLoading}
+    <Loader />
+  {/if}
 </div>

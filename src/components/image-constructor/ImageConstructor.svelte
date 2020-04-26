@@ -4,9 +4,14 @@
 
   import CategoryList from '../category-list/CategoryList.svelte';
   import ImageLoader from './ImageLoader.svelte';
-  import { imagesStore } from './store.js';
+  import Notification from '../notification/Notification.svelte';
+  import Loader from '../loader/Loader.svelte';
+  import { notificationStore } from '../notification/store.js';
+  import { imagesStore, defaultImagesStore } from './store.js';
   import { categoriesStore } from '../category-list/store.js';
   import { compressFile } from '../../utils/utils.js';
+  import { isValidURL } from '../../utils/validation.js';
+  import { API_URL } from '../../consts/common.js';
 
   const [send, receive] = crossfade({
 		duration: 200,
@@ -18,9 +23,10 @@
   let word = '';
   let nickname = '';
   let social = '';
+  let isLoading = false;
 
   $: isLoadDisabled = $imagesStore.some(r => r.dataUrl === '' && r.url === '')
-    || word.length < 3 || word.length > 12 || nickname === '' || social === '';
+    || word.length < 3 || word.length > 12 || nickname.length > 100 || isLoading;
 
   const handleSelectImage = (id) => {
     selected = id;
@@ -37,6 +43,7 @@
           ...image,
           url: detail,
           extension : detail.substring(detail.lastIndexOf('.') + 1),
+          dataUrl: '',
         };
       }
       return image;
@@ -54,6 +61,7 @@
             ...image,
             dataUrl: newDataUrl,
             extension: fileType,
+            url: '',
           };
         }
         return image;
@@ -66,6 +74,19 @@
 
   const handleLoadClick = async () => {
     try {
+      isLoading = true;
+
+      if (social.length !== 0 && !isValidURL(social)) {
+        notificationStore.set({
+          message: `Не валидный URL адрес социальной сети. Пожалуйста, введите другой адрес.
+          Например: https://www.instagram.com/programrobot/`,
+          type: 'error',
+        });
+        isLoading = false;
+
+        return;
+      }
+
       const request = {
         category: $categoriesStore.categoryList[$categoriesStore.currentCategoryIndex],
         images: $imagesStore,
@@ -73,16 +94,20 @@
         nickname,
         social,
       };
+
       // TODO: Create constant for API address
-      const response = await wretch().url('http://127.0.0.1:5000/api/candidates')
+      const response = await wretch().url(`${API_URL}/candidates`)
         .post(request)
         .json();
 
-      // TODO: Create notification
-      console.log(response);
+      notificationStore.set({ message: response.message, type: 'success' });
+      imagesStore.set(defaultImagesStore);
+      word = '';
     } catch (e) {
-      // TODO: Create notification
-      console.error(e);
+      const error = JSON.parse(e.message);
+      notificationStore.set({ message: error.message, type: 'error' });
+    } finally {
+      isLoading = false;
     }
   };
 
@@ -102,7 +127,6 @@
 		justify-content: center;
 		width: 100%;
 		height: 100%;
-    background-color: var(--main-bg-color);
 	}
 
 	.phone {
@@ -113,7 +137,7 @@
 		height: 85%;
 		border: 2vmin solid var(--main-grey-color);
 		border-bottom-width: 5vmin;
-		padding: 3vmin;
+		padding: 4vmin;
 		border-radius: 2vmin;
 	}
 
@@ -122,9 +146,13 @@
   }
 
   .humburger {
-    display: none;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
     background-color: var(--main-button-bg-color);
     border-radius: 10px;
+    cursor: pointer;
   }
 
 	.grid-img {
@@ -143,7 +171,10 @@
     height: 100%;
     display: flex;
     align-items: center;
+    justify-content: center;
     text-align: center;
+    cursor: pointer;
+    font-size: 1.25em;
   }
 
   img {
@@ -174,6 +205,22 @@
   .upload-button {
     background-color: var(--main-button-bg-color);
     border-radius: 10px;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .phone {
+		  position: relative;
+		  display: flex;
+		  flex-direction: column;
+		  width: 60%;
+		  height: 100%;
+		  padding: 0 3vmin;
+      border: none;
+	  }
+
+    .humburger {
+      left: -20px;
+    }
   }
 
   @media screen and (max-width: 500px) {
@@ -207,6 +254,8 @@
 
     .humburger {
       display: block;
+      top: 5px;
+      left: 0;
     }
   }
 </style>
@@ -218,7 +267,9 @@
 <div class="container">
 	<div class="phone">
     <div>
-      <h1>Конструктор задания</h1>
+      {#if $categoriesStore.categoryList[$categoriesStore.currentCategoryIndex]}
+        <h1>{$categoriesStore.categoryList[$categoriesStore.currentCategoryIndex].name}</h1>
+      {/if}
       <button class="humburger" on:click={handleCategoryListOpen}>&#9776;</button>
     </div>
 
@@ -295,4 +346,8 @@
       />
     {/if}
   </div>
+  <Notification />
+  {#if isLoading}
+    <Loader />
+  {/if}
 </div>

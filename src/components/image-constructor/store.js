@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-export const imagesStore = writable([
+export const defaultImagesStore = [
   {
     id: '1',
     alt: 'First image',
@@ -33,5 +33,7 @@ export const imagesStore = writable([
     order: 4,
     extension: '',
   },
-]);
+]
+
+export const imagesStore = writable(defaultImagesStore);
 

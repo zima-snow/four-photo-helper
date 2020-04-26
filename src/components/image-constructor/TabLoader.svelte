@@ -2,6 +2,9 @@
   import { createEventDispatcher } from 'svelte';
 
   import { isUploadSupported } from '../../utils/utils.js';
+  import { testImage } from '../../utils/validation.js';
+  import { notificationStore } from '../notification/store.js';
+
 
   const dispatch = createEventDispatcher();
 
@@ -25,34 +28,54 @@
 
     // FileReader support
     if (FileReader && files && files.length) {
-        const fr = new FileReader();
-        fileType = files[0].type;
+      const fr = new FileReader();
+      fileType = files[0].type;
 
-        fr.onload = () => {
-          dataUrl = fr.result;
-          dispatch('previewImageEvent', dataUrl);
-        };
+      fr.onload = () => {
+        dataUrl = fr.result;
+        dispatch('previewImageEvent', dataUrl);
+      };
 
-        fr.onerror = () => {
-		      alert('Ошибка чтения. Пожалуйста, загрузите другое изображение.');
-	      };
+      fr.onerror = () => {
+        notificationStore.set({
+          message: 'Ошибка чтения. Пожалуйста, загрузите другое изображение.',
+          type: 'error',
+        });
+	    };
 
-        fr.readAsDataURL(files[0]);
+      fr.readAsDataURL(files[0]);
     }
 
     // Not supported
     else {
-        alert(`Обработка изображений не поддерживается Вашим браузером.
-          Пожалуйста, загрузите изображение через копирование ссылки на него в соседней вкладке.`);
+      notificationStore.set({
+        message: `Обработка изображений не поддерживается Вашим браузером.
+          Пожалуйста, загрузите изображение через копирование ссылки на него в соседней вкладке.`,
+        type: 'warning',
+      });
     }
   };
+
+  const hadnleAddUrlConfirm = () => {
+    testImage(url).then(() => {
+      dispatch('addUrlEvent', url);
+    }, () => {
+      url = '';
+      dispatch('previewImageEvent', url);
+      notificationStore.set({
+        message: `Не валидный URL адрес изображения. Пожалуйста, введите другой адрес.
+        Адрес должен оканчиваться на ".jpg", ".jpeg", ".png" или ".gif".
+        Например: https://ercourse.com/images/channel_image.png`,
+        type: 'error',
+      });
+    });
+  }
 </script>
 
 <style>
   .tab-container {
     width: 100%;
     margin-top: 20px;
-    background-color: var(--main-bg-color);
   }
 
   .tab-buttons-container {
@@ -111,11 +134,17 @@
   </div>
   <div class="tab-content" class:active={active === '1'}>
     <label for="url">Введите ссылку</label>
-    <input id="url" type="text" on:input={handleUrlChange} placeholder="Введите ссылку"/>
+    <input
+      id="url"
+      type="text"
+      on:input={handleUrlChange}
+      placeholder="Введите ссылку"
+      bind:value={url}
+    />
     <button
       type="button"
       disabled={url === ''}
-      on:click={() => dispatch('addUrlEvent', url)}
+      on:click={hadnleAddUrlConfirm}
     >
       Подтвердить
     </button>

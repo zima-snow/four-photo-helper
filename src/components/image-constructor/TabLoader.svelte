@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  import { isUploadSupported } from '../../utils/utils.js';
+  import { isUploadSupported, isSizeOfBase64LessMax } from '../../utils/utils.js';
   import { testImage } from '../../utils/validation.js';
   import { notificationStore } from '../notification/store.js';
 
@@ -56,7 +56,7 @@
     }
   };
 
-  const hadnleAddUrlConfirm = () => {
+  const handleAddUrlConfirm = () => {
     testImage(url).then(() => {
       dispatch('addUrlEvent', url);
     }, () => {
@@ -64,11 +64,23 @@
       dispatch('previewImageEvent', url);
       notificationStore.set({
         message: `Не валидный URL адрес изображения. Пожалуйста, введите другой адрес.
-        Адрес должен оканчиваться на ".jpg", ".jpeg", ".png" или ".gif".
+        Рекомендуется вводить URL, заканчивающийся на ".jpg", ".jpeg", ".png" или ".gif".
         Например: https://ercourse.com/images/channel_image.png`,
         type: 'error',
       });
     });
+  }
+
+  const handleAddDataUrlConfirm = () => {
+    if (isSizeOfBase64LessMax(dataUrl)) {
+      dispatch('addDataUrlEvent', { dataUrl, fileType });
+    } else {
+      notificationStore.set({
+        message: `Размер загружаемого изображения больше 5 Мегабайт.
+          Пожалуйста, выберите изображение размером менее 5 Мегабайт.`,
+        type: 'error',
+      });
+    }
   }
 </script>
 
@@ -89,6 +101,7 @@
 
   .tab-button.active {
     background-color: var(--main-no-image-bg-color);
+    color: var(--white-color);
   }
 
   .tab-content {
@@ -113,6 +126,11 @@
     background-color: var(--main-button-bg-color);
     border-radius: 10px;
   }
+
+  label {
+    text-align: center;
+    width: 75%;
+  }
 </style>
 
 <div class="tab-container">
@@ -122,17 +140,33 @@
       class:active={active === '1'}
       on:click={() => switchActive('1')}
     >
-      Загрузка по ссылке
+      Загрузка с устройства
     </button>
     <button
       class="tab-button"
       class:active={active === '2'}
       on:click={() => switchActive('2')}
     >
-      Загрузка с устройства
+      Загрузка по ссылке
     </button>
   </div>
   <div class="tab-content" class:active={active === '1'}>
+    {#if isUploadSupported()}
+      <label for="file">Выберите изображение (размер не более 5 Мегабайт)</label>
+      <input id="file" type="file" accept="image/*" on:change={handleFileInputChange}>
+      <button
+        type="button"
+        disabled={!fileType}
+        on:click={handleAddDataUrlConfirm}
+      >
+        Подтвердить
+      </button>
+    {:else}
+      Браузер на Вашем устройстве не поддерживает загрузку файлов.
+      Пожалуйста, загрузите изображение через копирование ссылки на него в соседней вкладке.
+    {/if}
+  </div>
+  <div class="tab-content" class:active={active === '2'}>
     <label for="url">Введите ссылку</label>
     <input
       id="url"
@@ -144,25 +178,9 @@
     <button
       type="button"
       disabled={url === ''}
-      on:click={hadnleAddUrlConfirm}
+      on:click={handleAddUrlConfirm}
     >
       Подтвердить
     </button>
-  </div>
-  <div class="tab-content" class:active={active === '2'}>
-    {#if isUploadSupported()}
-      <label for="file">Выберите изображение</label>
-      <input id="file" type="file" accept="image/*" on:change={handleFileInputChange}>
-      <button
-        type="button"
-        disabled={!fileType}
-        on:click={() => dispatch('addDataUrlEvent', { dataUrl, fileType })}
-      >
-        Подтвердить
-      </button>
-    {:else}
-      Браузер на Вашем устройстве не поддерживает загрузку файлов.
-      Пожалуйста, загрузите изображение через копирование ссылки на него в соседней вкладке.
-    {/if}
   </div>
 </div>

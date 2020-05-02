@@ -6,6 +6,8 @@
   import ImageLoader from './ImageLoader.svelte';
   import Notification from '../notification/Notification.svelte';
   import Loader from '../loader/Loader.svelte';
+  import Instruction from '../instruction/Instruction.svelte';
+  import CandidateExample from '../candidate-example/CandidateExample.svelte';
   import { notificationStore } from '../notification/store.js';
   import { imagesStore, defaultImagesStore } from './store.js';
   import { categoriesStore } from '../category-list/store.js';
@@ -18,7 +20,9 @@
 		fallback: scale
   });
 
+  let isInstructionVisible = true;
   let isCategoryListVisible = true;
+  let isCandidateExampleVisible = false;
   let selected = null;
   let word = '';
   let nickname = '';
@@ -39,10 +43,12 @@
   const handleAddUrl = ({ detail }) => {
     const newImages = $imagesStore.map(image => {
       if (image.id === selected) {
+        const extension = detail.match(/\.(jpeg|jpg|gif|png)$/) != null
+          ? detail.substring(detail.lastIndexOf('.') + 1) : 'jpg';
         return {
           ...image,
           url: detail,
-          extension : detail.substring(detail.lastIndexOf('.') + 1),
+          extension,
           dataUrl: '',
         };
       }
@@ -54,22 +60,31 @@
   };
 
   const handleAddDataUrl = ({ detail: { dataUrl, fileType } }) => {
-    compressFile(dataUrl, fileType, (newDataUrl) => {
-      const newImages = $imagesStore.map(image => {
-        if (image.id === selected) {
-          return {
-            ...image,
-            dataUrl: newDataUrl,
-            extension: fileType,
-            url: '',
-          };
-        }
-        return image;
-      });
+    try {
+      compressFile(dataUrl, fileType, (newDataUrl) => {
+        const newImages = $imagesStore.map(image => {
+          if (image.id === selected) {
+            return {
+              ...image,
+              dataUrl: newDataUrl,
+              extension: fileType,
+              url: '',
+            };
+          }
+          return image;
+        });
 
-      imagesStore.set([...newImages]);
-      selected = null;
-    });
+        imagesStore.set([...newImages]);
+        selected = null;
+      });
+    } catch (e) {
+      notificationStore.set({
+        message: `Ошибка при сжатии изображения. Возможно, вы пытаетесь загрузить
+        слишком большой файл. Пожалуйста, загрузите другое изображение, или воспользутесь
+        первым способом - через добавление URL адреса изображения.`,
+        type: 'error',
+      });
+    }
   }
 
   const handleLoadClick = async () => {
@@ -118,6 +133,18 @@
   const handleCategoryChosen = () => {
     isCategoryListVisible = false;
   };
+
+  const handleCloseInstruction = () => {
+    isInstructionVisible = false;
+  }
+
+  const handleCandidateExampleOpen = () => {
+    isCandidateExampleVisible = true;
+  };
+
+  const handleCandidateExampleClose = () => {
+    isCandidateExampleVisible = false;
+  };
 </script>
 
 <style>
@@ -126,7 +153,6 @@
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		height: 100%;
 	}
 
 	.phone {
@@ -145,21 +171,31 @@
     display: none;
   }
 
-  .humburger {
-    display: block;
+  .top-buttons-container {
+    display: flex;
     position: absolute;
     top: 0;
     left: 0;
+  }
+
+  .humburger {
     background-color: var(--main-button-bg-color);
     border-radius: 10px;
     cursor: pointer;
+  }
+
+  .question-mark {
+    background-color: var(--main-button-bg-color);
+    border-radius: 10px;
+    cursor: pointer;
+    margin-left: 10%;
   }
 
 	.grid-img {
 		display: grid;
 		flex: 1;
 		grid-template-columns: repeat(2, 1fr);
-		grid-template-rows: repeat(2, 50%);
+		grid-template-rows: repeat(2, 200px);
 		grid-gap: 2vmin;
 	}
 
@@ -207,6 +243,10 @@
     border-radius: 10px;
   }
 
+  .stub {
+    height: 20px;
+  }
+
   @media screen and (max-width: 1024px) {
     .phone {
 		  position: relative;
@@ -218,8 +258,8 @@
       border: none;
 	  }
 
-    .humburger {
-      left: -20px;
+    .top-buttons-container {
+      left: -40px;
     }
   }
 
@@ -240,22 +280,21 @@
 		  font-weight: 300;
 		  text-transform: uppercase;
 		  font-size: 5vmin;
-		  margin: 0.5em 0 1em 0;
+		  margin: 0.75em 0 1em 0;
       float: right;
 	  }
 
     .grid-img {
-		  grid-template-rows: repeat(2, 45%);
+		  grid-template-rows: repeat(2, 200px);
 	  }
 
     .grid-info {
-      margin-top: 0;
+      margin-top: 10px;
     }
 
-    .humburger {
-      display: block;
+    .top-buttons-container {
       top: 5px;
-      left: 0;
+      left: 10px;
     }
   }
 </style>
@@ -264,13 +303,24 @@
   <CategoryList on:categoryChosenEvent={handleCategoryChosen} />
 {/if}
 
+{#if isInstructionVisible}
+  <Instruction on:closeInstructionEvent={handleCloseInstruction} />
+{/if}
+
+{#if isCandidateExampleVisible}
+  <CandidateExample on:closeExampleEvent={handleCandidateExampleClose} />
+{/if}
+
 <div class="container">
 	<div class="phone">
     <div>
       {#if $categoriesStore.categoryList[$categoriesStore.currentCategoryIndex]}
         <h1>{$categoriesStore.categoryList[$categoriesStore.currentCategoryIndex].name}</h1>
       {/if}
-      <button class="humburger" on:click={handleCategoryListOpen}>&#9776;</button>
+      <div class="top-buttons-container">
+        <button class="humburger" on:click={handleCategoryListOpen}>&#9776;</button>
+        <button class="question-mark" on:click={handleCandidateExampleOpen}>?</button>
+      </div>
     </div>
 
 		<div class="grid-img">
@@ -300,7 +350,7 @@
 
     <div class="grid-info">
       <div class="grid-item-word">
-        <label for="word">Слово (3 - 12 букв)</label>
+        <label for="word">Слово (3-12 букв)</label>
         <input
           id="word"
           type="text"
@@ -318,11 +368,11 @@
         />
       </div>
       <div class="grid-item-social">
-        <label for="social">Ссылка на профиль любой социальной сети</label>
+        <label for="social">Ссылка на профиль любой соцсети</label>
         <input
           id="social"
           type="text"
-          placeholder="Ссылка на профиль любой социальной сети"
+          placeholder="Ссылка на профиль любой соцсети"
           bind:value={social}
         />
       </div>
@@ -336,6 +386,7 @@
     >
       Загрузить задание
     </button>
+    <div class="stub">&nbsp;</div>
 
     {#if selected}
       <ImageLoader

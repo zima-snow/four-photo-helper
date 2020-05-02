@@ -25,6 +25,7 @@
     "publish": "scp -r ./dist/* lex@165.22.192.60:/var/www/for-alexander.tk/html"
   },
   "dependencies": {
+    "dompurify": "^2.0.10",
     "wretch": "^1.7.2"
   }
 }

@@ -1,4 +1,4 @@
-import { MAX_WIDTH, MAX_HEIGHT } from '../consts/common.js';
+import { MAX_WIDTH, MAX_HEIGHT, MAX_SIZE_OF_IMAGE } from '../consts/common.js';
 
 export const isUploadSupported = () => {
   if (navigator.userAgent.match(/(Android (1.0|1.1|1.5|1.6|2.0|2.1))|(Windows Phone (OS 7|8.0))|(XBLWP)|(ZuneWP)|(w(eb)?OSBrowser)|(webOS)|(Kindle\/(1.0|2.0|2.5|3.0))/)) {
@@ -58,8 +58,7 @@ export const compressFile = (dataURL, fileType, callback) => {
 		canvas.height = newHeight;
 
 		const context = canvas.getContext('2d');
-
-		context.drawImage(this, 0, 0, newWidth, newHeight);
+		context.drawImage(image, 0, 0, newWidth, newHeight);
 		const newDataUrl = canvas.toDataURL(fileType);
 
     callback(newDataUrl);
@@ -69,3 +68,11 @@ export const compressFile = (dataURL, fileType, callback) => {
 		alert('Ошибка при сжатии изображения. Будет загружено исходное изображение');
   };
 };
+
+export const isSizeOfBase64LessMax = (src) => {
+  let base64Length = src.length - (src.indexOf(',') + 1);
+  let padding = (src.charAt(src.length - 2) === '=') ? 2 : ((src.charAt(src.length - 1) === '=') ? 1 : 0);
+  let fileSize = base64Length * 0.75 - padding;
+
+  return fileSize <= MAX_SIZE_OF_IMAGE;
+}

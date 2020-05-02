@@ -43,6 +43,7 @@
     background: -moz-linear-gradient(45deg, #4c4c4c 0%, #595959 12%, #666666 25%, #474747 39%, #2c2c2c 50%, #000000 51%, #111111 60%, #2b2b2b 76%, #1c1c1c 91%, #131313 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(45deg, #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(45deg, #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    overflow-y: scroll;
   }
 
   .no-image {
@@ -50,19 +51,15 @@
     border: 1px solid var(--main-borders-color);
     border-radius: 10px;
     width: 70%;
-    height: 60%;
+    height: 300px;
     margin-top: 3vmin;
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: column nowrap;
     justify-content: space-evenly;
     text-align: center;
     padding: 5px;
     font-size: 1.1em;
-  }
-
-  .no-image a {
-    color: var(--light-yellow);
-    text-decoration: underline;
+    overflow-y: scroll;
   }
 
   .example {
@@ -73,7 +70,7 @@
     border: 1px solid var(--main-borders-color);
     border-radius: 10px;
     width: 70%;
-    height: 60%;
+    height: 400px;
     margin-top: 3vmin;
   }
 
@@ -102,16 +99,17 @@
     .container {
       border: none;
       justify-content: flex-start;
+      height: 100%;
     }
 
     .no-image {
       width: 75%;
-      height: 55%;
+      height: 350px;
     }
 
     img {
       width: 75%;
-      height: 55%;
+      height: 350px;
     }
   }
 </style>
@@ -130,16 +128,14 @@
       Нет картинки. Выберите один из вариантов добавления ниже и загрузите картинку.
       
       <div class="example">
-        При добавлении URL картинки, адрес должен заканчиваться на
+        При добавлении URL картинки, желательно, чтобы адрес заканчивался на
         <span class="notice-text">".jpg", ".jpeg", ".png" или ".gif"</span>.
         Например: <span class="notice-text">https://ercourse.com/images/channel_image.png</span>
       </div>
 
       <div>
-        Картинки можно найти
-        <a href="https://www.google.ru/imghp?hl=ru" target="_blank">в Google Картинках</a>
-        или
-        <a href="https://yandex.ru/images/" target="_blank">в Яндекс Картинках</a>
+        Если картинка не грузится по URL, сохраните её на устройство,
+        затем загрузите через вкладку "Загрузка с устройства".
       </div>
     </div>
   {:else}

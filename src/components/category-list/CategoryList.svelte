@@ -72,8 +72,8 @@
 
   @media screen and (max-width: 1024px) {
     .container {
-      width: 70%;
-      left: 15%;
+      width: 80%;
+      left: 10%;
     }
   }
 

@@ -110,7 +110,6 @@
         social,
       };
 
-      // TODO: Create constant for API address
       const response = await wretch().url(`${API_URL}/candidates`)
         .post(request)
         .json();

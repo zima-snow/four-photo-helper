@@ -10,4 +10,5 @@ export const NOTIFICATIONS_BG_COLORS = {
 
 export const MAX_SIZE_OF_IMAGE = 5242880 // 5Mb
 
-export const API_URL = 'http://127.0.0.1:5000/api';
+export const API_URL = 'https://for-alexander.tk/api';
+// export const API_URL = 'http://127.0.0.1:5000/api';

@@ -3,6 +3,8 @@
     position: fixed;
     width: 100%;
     height: 100vh;
+    top: 0;
+    left: 0;
     background-color: black;
     opacity: 50%;
   }
@@ -51,6 +53,5 @@
   }
 </style>
 
-<div class="covering">
-  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-</div>
+<div class="covering"></div>
+<div class="lds-ring"><div></div><div></div><div></div><div></div></div>

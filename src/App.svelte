@@ -1,5 +1,10 @@
 <script>
+  import { Router, Link, Route } from 'svelte-routing';
+
   import ImageConstructor from './components/image-constructor/ImageConstructor.svelte';
+  import Login from './components/admin-panel/Login.svelte';
+  import AdminPanel from './components/admin-panel/AdminPanel.svelte';
+
 </script>
 
 <style>
@@ -26,7 +31,14 @@
     --main-button-bg-color: #f5c701;
 
     --light-yellow: #ffff72;
+    --light-red: #ef5350;
   }
 </style>
 
-<ImageConstructor />
+<Router>
+  <div>
+    <Route path="login" component="{Login}" />
+    <Route path="admin-panel" component="{AdminPanel}" />
+    <Route path="/"><ImageConstructor /></Route>
+  </div>
+</Router>

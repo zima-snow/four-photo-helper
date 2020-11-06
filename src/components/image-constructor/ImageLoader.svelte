@@ -5,6 +5,8 @@
   import TabLoader from './TabLoader.svelte';
   import { imagesStore } from './store.js';
 
+  export let withOrderChange = false;
+
   const [send, receive] = crossfade({
 		duration: 200,
 		fallback: scale
@@ -31,7 +33,7 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 		top: 0;
 		left: 0;
@@ -142,8 +144,10 @@
     <img src={url} alt="Произошла ошибка при загрузке картинки" />
   {/if}
   <TabLoader
+    withOrderChange={withOrderChange}
     on:addUrlEvent
     on:addDataUrlEvent
+    on:changeImageOrderEvent
     on:previewImageEvent={handlePreviewImage}
   />
 </div>

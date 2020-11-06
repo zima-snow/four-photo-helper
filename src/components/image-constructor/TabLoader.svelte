@@ -5,6 +5,7 @@
   import { testImage } from '../../utils/validation.js';
   import { notificationStore } from '../notification/store.js';
 
+  export let withOrderChange = false;
 
   const dispatch = createEventDispatcher();
 
@@ -12,6 +13,7 @@
   let url = '';
   let dataUrl = '';
   let fileType;
+  let order;
 
   const switchActive = (index) => {
     active = index;
@@ -82,6 +84,10 @@
       });
     }
   }
+
+  const handleChangeOrderConfirm = () => {
+    dispatch('changeImageOrderEvent', order);
+  }
 </script>
 
 <style>
@@ -149,6 +155,15 @@
     >
       Загрузка по ссылке
     </button>
+    {#if withOrderChange}
+      <button
+        class="tab-button"
+        class:active={active === '3'}
+        on:click={() => switchActive('3')}
+      >
+        Изменить порядок
+      </button>
+    {/if}
   </div>
   <div class="tab-content" class:active={active === '1'}>
     {#if isUploadSupported()}
@@ -181,6 +196,22 @@
       on:click={handleAddUrlConfirm}
     >
       Подтвердить
+    </button>
+  </div>
+    <div class="tab-content" class:active={active === '3'}>
+    <label for="order">Введите новый порядок</label>
+    <input
+      id="order"
+      type="text"
+      placeholder="Введите новый порядок"
+      bind:value={order}
+    />
+    <button
+      type="button"
+      disabled={order === '' || ![1, 2, 3, 4].includes(+order)}
+      on:click={handleChangeOrderConfirm}
+    >
+      Изменить
     </button>
   </div>
 </div>
